@@ -25,7 +25,8 @@
 
 <header>
     <h1>尾張旭魅力発信ブログ</h1>
-    <p>〜 尾張旭を有名にしたい一般人：嘉発 〜</p>
+    <p>〜 尾張旭を有名にしたい一般人 〜</p>
+    <div style="font-size:0.7rem; opacity:0.8;">※非公式サイトです</div>
 </header>
 
 <div class="container" id="blog-posts">読み込み中...</div>
@@ -51,7 +52,6 @@
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
 
-    // 嘉発さんのFirebase設定に合わせて修正したよ
     const firebaseConfig = {
         apiKey: "AIzaSyAttvrhbeton37WOWTcBQqUhcqdep0oVFs",
         authDomain: "owariasahi-yuumei-burogu.firebaseapp.com",
@@ -81,7 +81,6 @@
                     post.images.forEach(url => { imagesHtml += `<img src="${url}">`; });
                 }
                 imagesHtml += '</div>';
-                
                 postContainer.insertAdjacentHTML('beforeend', `
                     <article class="post">
                         <span class="badge">${post.category}</span><small> ${post.date}</small>
@@ -90,12 +89,12 @@
                         ${imagesHtml}
                     </article>`);
             });
-        });
+        }, (error) => { alert("読み込みエラー: " + error.message); });
     }
 
     document.getElementById('submit-post').onclick = async () => {
         const btn = document.getElementById('submit-post');
-        btn.innerText = "アップロード中...";
+        btn.innerText = "送信中...";
         btn.disabled = true;
 
         const files = document.getElementById('post-image').files;
@@ -109,19 +108,19 @@
                 imageUrls.push(url);
             }
 
-            const data = {
+            await addDoc(collection(db, "posts"), {
                 title: document.getElementById('post-title').value,
                 category: document.getElementById('post-tag').value,
                 content: document.getElementById('post-content').value.replace(/\n/g, '<br>'),
                 images: imageUrls,
                 date: new Date().toLocaleDateString(),
                 timestamp: serverTimestamp()
-            };
+            });
 
-            await addDoc(collection(db, "posts"), data);
             document.getElementById('post-modal').style.display = 'none';
+            document.getElementById('post-image').value = ""; // フォームをクリア
         } catch (e) {
-            alert("エラーが発生したよ： " + e.message);
+            alert("【投稿エラー】\n" + e.message + "\n\n※FirebaseのStorageルールを確認してね！");
         } finally {
             btn.innerText = "保存する";
             btn.disabled = false;
@@ -129,14 +128,10 @@
     };
 
     document.getElementById('login-exec').onclick = async () => {
-        const id = document.getElementById('login-id').value;
-        const pw = document.getElementById('login-pw').value;
         try {
-            await signInWithEmailAndPassword(auth, id, pw);
+            await signInWithEmailAndPassword(auth, document.getElementById('login-id').value, document.getElementById('login-pw').value);
             document.getElementById('login-modal').style.display = 'none';
-        } catch (e) {
-            alert("ログイン失敗！メアドかパスワードが違うかも。");
-        }
+        } catch (e) { alert("ログイン失敗！"); }
     };
 
     document.getElementById('post-btn').onclick = () => {
