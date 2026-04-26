@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>尾張旭魅力発信ブログ</title>
+    
+    <title>尾張旭魅力発信ブログ｜尾張旭市を有名にしたい一般人の活動記録</title>
+    <meta name="description" content="愛知県尾張旭市の魅力を発信する個人ブログです。乗り物、食べ物、お出かけスポットなど、尾張旭市を有名にするために日々更新中！">
+    <meta name="keywords" content="尾張旭市, 尾張旭, 魅力, ブログ, 愛知県, 観光, グルメ">
+    
+    <meta property="og:title" content="尾張旭魅力発信ブログ">
+    <meta property="og:description" content="尾張旭市を有名にしたい一般人による魅力発信サイト。">
+    <meta property="og:type" content="website">
+    
     <style>
         :root { --main-color: #e63946; --bg-color: #f1faee; --text-color: #1d3557; }
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; padding-bottom: 80px; }
@@ -33,8 +41,9 @@
     <p>〜 尾張旭を有名にしたい一般人 〜</p>
 </header>
 
-<div class="container" id="blog-posts">読み込み中...</div>
-<button id="post-btn">🖊️</button>
+<main class="container" id="blog-posts">読み込み中...</main>
+
+<button id="post-btn" aria-label="投稿する">🖊️</button>
 
 <div id="login-modal" class="modal"><div class="modal-content"><h3>管理者ログイン</h3><input type="email" id="login-id" placeholder="メールアドレス"><input type="password" id="login-pw" placeholder="パスワード"><button id="login-exec" style="background:#1d3557; color:white; border:none; padding:12px; width:100%; border-radius:6px;">ログイン</button></div></div>
 
@@ -42,9 +51,9 @@
     <div class="modal-content">
         <h3 id="modal-title">記事を書く</h3>
         <input type="hidden" id="edit-id">
-        <input type="text" id="post-title" placeholder="タイトル">
+        <input type="text" id="post-title" placeholder="タイトル（検索されたい言葉を入れよう！）">
         <select id="post-tag"><option value="乗り物">乗り物</option><option value="食べ物">食べ物</option><option value="お出かけ">お出かけ</option><option value="その他">その他</option></select>
-        <textarea id="post-content" placeholder="内容（Discordの画像URLも可）" rows="8"></textarea>
+        <textarea id="post-content" placeholder="内容（「尾張旭」という言葉を混ぜるとヒットしやすくなるよ）" rows="8"></textarea>
         <button id="submit-post">保存する</button>
         <button onclick="document.getElementById('post-modal').style.display='none'" style="margin-top:10px; background:none; border:none; color:#888; cursor:pointer; width:100%;">キャンセル</button>
     </div>
@@ -72,27 +81,23 @@
     onAuthStateChanged(auth, (user) => { currentUser = user; renderPosts(); });
 
     function renderPosts() {
-        // ここをシンプルにしたよ！設定いらずで動くはず。
         const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
         onSnapshot(q, (snapshot) => {
             const container = document.getElementById('blog-posts');
             container.innerHTML = '';
-            
             let allPosts = [];
             snapshot.forEach((fbDoc) => {
                 allPosts.push({ id: fbDoc.id, ...fbDoc.data() });
             });
-
-            // プログラム側で「ピン留め」を上に持ってくるようにしたよ
             allPosts.sort((a, b) => (b.isPinned || false) - (a.isPinned || false));
 
             allPosts.forEach((p) => {
                 const id = p.id;
                 const isPinned = p.isPinned || false;
-                let contentWithImages = p.content.replace(/(https?:\/\/[\w\/:%#\$&\?\(\)~\.=\+\-]+(\.jpg|\.png|\.gif|\.jpeg|\.webp))/gi, '<img src="$1" style="max-width:100%; border-radius:8px; margin-top:10px; display:block;">');
+                let contentWithImages = p.content.replace(/(https?:\/\/[\w\/:%#\$&\?\(\)~\.=\+\-]+(\.jpg|\.png|\.gif|\.jpeg|\.webp))/gi, '<img src="$1" style="max-width:100%; border-radius:8px; margin-top:10px; display:block;" alt="投稿画像">');
 
                 container.insertAdjacentHTML('beforeend', `
-                    <div class="post ${isPinned ? 'pinned' : ''}">
+                    <article class="post ${isPinned ? 'pinned' : ''}">
                         ${isPinned ? '<span class="pin-badge">📌 固定された投稿</span>' : ''}
                         <span class="badge">${p.category}</span> <small>${p.date || ''}</small>
                         <h2>${p.title}</h2>
@@ -102,7 +107,7 @@
                             <span class="edit-btn" onclick="openEdit('${id}', '${p.title}', '${p.category}', \`${p.content.replace(/<br>/g, '\n')}\`)">編集</span>
                             <span class="delete-btn" onclick="deletePost('${id}')">削除</span>
                         </div>
-                    </div>`);
+                    </article>`);
             });
         });
     }
