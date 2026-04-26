@@ -14,8 +14,6 @@
         .post-images img { width: calc(50% - 5px); height: auto; border-radius: 8px; object-fit: cover; }
         .post h2 { margin: 10px 0; color: var(--main-color); }
         .badge { background: #a8dadc; color: var(--text-color); padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; }
-        .admin-controls { display: none; margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px; }
-        .edit-btn, .delete-btn { cursor: pointer; font-size: 0.9rem; margin-right: 15px; }
         #post-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--main-color); color: white; border: none; border-radius: 50%; font-size: 30px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 100; display: flex; align-items: center; justify-content: center; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 2rem; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
@@ -33,32 +31,32 @@
 <div class="container" id="blog-posts">読み込み中...</div>
 <button id="post-btn">✒️</button>
 
-<div id="login-modal" class="modal"><div class="modal-content"><h3>管理者ログイン</h3><input type="email" id="login-id"><input type="password" id="login-pw"><button id="login-exec">ログイン</button></div></div>
+<div id="login-modal" class="modal"><div class="modal-content"><h3>管理者ログイン</h3><input type="email" id="login-id" placeholder="メールアドレス"><input type="password" id="login-pw" placeholder="パスワード"><button id="login-exec" style="background:#1d3557; color:white; border:none; padding:10px; width:100%; border-radius:6px;">ログイン</button></div></div>
+
 <div id="post-modal" class="modal">
     <div class="modal-content">
-        <h3 id="modal-title">記事を書く</h3>
-        <input type="hidden" id="edit-id">
+        <h3>記事を書く</h3>
         <input type="text" id="post-title" placeholder="タイトル">
         <select id="post-tag"><option value="乗り物">乗り物</option><option value="食べ物">食べ物</option><option value="お出かけ">お出かけ</option></select>
         <textarea id="post-content" placeholder="内容" rows="5"></textarea>
         <input type="file" id="post-image" accept="image/*" multiple>
         <button id="submit-post">保存する</button>
-        <button onclick="document.getElementById('post-modal').style.display='none'">キャンセル</button>
+        <button onclick="document.getElementById('post-modal').style.display='none'" style="margin-top:10px; background:none; border:none; color:#888; cursor:pointer; width:100%;">キャンセル</button>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
 
-    // ⚠️ 嘉発さんのFirebase設定に書き換えてね（今のままだと僕のテスト用だよ！）
+    // 嘉発さんのFirebase設定に合わせて修正したよ
     const firebaseConfig = {
         apiKey: "AIzaSyAttvrhbeton37WOWTcBQqUhcqdep0oVFs",
         authDomain: "owariasahi-yuumei-burogu.firebaseapp.com",
         projectId: "owariasahi-yuumei-burogu",
-        storageBucket: "owariasahi-yuumei-burogu.appspot.com", // ここが重要！
+        storageBucket: "owariasahi-yuumei-burogu.firebasestorage.app",
         messagingSenderId: "486043897492",
         appId: "1:486043897492:web:e0b8e3263db278bde12e81"
     };
@@ -78,7 +76,6 @@
             postContainer.innerHTML = '';
             snapshot.forEach((fbDoc) => {
                 const post = fbDoc.data();
-                const id = fbDoc.id;
                 let imagesHtml = '<div class="post-images">';
                 if (post.images) {
                     post.images.forEach(url => { imagesHtml += `<img src="${url}">`; });
@@ -91,9 +88,6 @@
                         <h2>${post.title}</h2>
                         <div>${post.content}</div>
                         ${imagesHtml}
-                        <div class="admin-controls" style="display: ${currentUser ? 'block' : 'none'}">
-                            <span class="delete-btn" onclick="deletePost('${id}')">削除</span>
-                        </div>
                     </article>`);
             });
         });
@@ -107,39 +101,48 @@
         const files = document.getElementById('post-image').files;
         let imageUrls = [];
 
-        // 複数画像を順番にアップロード
-        for (let file of files) {
-            const storageRef = ref(storage, 'images/' + Date.now() + "_" + file.name);
-            await uploadBytes(storageRef, file);
-            const url = await getDownloadURL(storageRef);
-            imageUrls.push(url);
+        try {
+            for (let file of files) {
+                const storageRef = ref(storage, 'images/' + Date.now() + "_" + file.name);
+                await uploadBytes(storageRef, file);
+                const url = await getDownloadURL(storageRef);
+                imageUrls.push(url);
+            }
+
+            const data = {
+                title: document.getElementById('post-title').value,
+                category: document.getElementById('post-tag').value,
+                content: document.getElementById('post-content').value.replace(/\n/g, '<br>'),
+                images: imageUrls,
+                date: new Date().toLocaleDateString(),
+                timestamp: serverTimestamp()
+            };
+
+            await addDoc(collection(db, "posts"), data);
+            document.getElementById('post-modal').style.display = 'none';
+        } catch (e) {
+            alert("エラーが発生したよ： " + e.message);
+        } finally {
+            btn.innerText = "保存する";
+            btn.disabled = false;
         }
-
-        const data = {
-            title: document.getElementById('post-title').value,
-            category: document.getElementById('post-tag').value,
-            content: document.getElementById('post-content').value.replace(/\n/g, '<br>'),
-            images: imageUrls,
-            date: new Date().toLocaleDateString(),
-            timestamp: serverTimestamp()
-        };
-
-        await addDoc(collection(db, "posts"), data);
-        document.getElementById('post-modal').style.display = 'none';
-        btn.innerText = "保存する";
-        btn.disabled = false;
     };
 
-    // ログイン処理などは省略（上のコードに組み込み済み）
     document.getElementById('login-exec').onclick = async () => {
-        await signInWithEmailAndPassword(auth, document.getElementById('login-id').value, document.getElementById('login-pw').value);
-        document.getElementById('login-modal').style.display = 'none';
+        const id = document.getElementById('login-id').value;
+        const pw = document.getElementById('login-pw').value;
+        try {
+            await signInWithEmailAndPassword(auth, id, pw);
+            document.getElementById('login-modal').style.display = 'none';
+        } catch (e) {
+            alert("ログイン失敗！メアドかパスワードが違うかも。");
+        }
     };
+
     document.getElementById('post-btn').onclick = () => {
         if (!currentUser) document.getElementById('login-modal').style.display = 'flex';
         else document.getElementById('post-modal').style.display = 'flex';
     };
-    window.deletePost = async (id) => { if(confirm("消すよ？")) await deleteDoc(doc(db, "posts", id)); };
 </script>
 </body>
 </html>
