@@ -72,16 +72,23 @@
     onAuthStateChanged(auth, (user) => { currentUser = user; renderPosts(); });
 
     function renderPosts() {
-        // ピン留め(isPinned)を優先して、その後に時間順で並べる
-        const q = query(collection(db, "posts"), orderBy("isPinned", "desc"), orderBy("timestamp", "desc"));
+        // ここをシンプルにしたよ！設定いらずで動くはず。
+        const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
         onSnapshot(q, (snapshot) => {
             const container = document.getElementById('blog-posts');
             container.innerHTML = '';
+            
+            let allPosts = [];
             snapshot.forEach((fbDoc) => {
-                const p = fbDoc.data();
-                const id = fbDoc.id;
+                allPosts.push({ id: fbDoc.id, ...fbDoc.data() });
+            });
+
+            // プログラム側で「ピン留め」を上に持ってくるようにしたよ
+            allPosts.sort((a, b) => (b.isPinned || false) - (a.isPinned || false));
+
+            allPosts.forEach((p) => {
+                const id = p.id;
                 const isPinned = p.isPinned || false;
-                
                 let contentWithImages = p.content.replace(/(https?:\/\/[\w\/:%#\$&\?\(\)~\.=\+\-]+(\.jpg|\.png|\.gif|\.jpeg|\.webp))/gi, '<img src="$1" style="max-width:100%; border-radius:8px; margin-top:10px; display:block;">');
 
                 container.insertAdjacentHTML('beforeend', `
@@ -133,7 +140,7 @@
         try {
             if (id) await updateDoc(doc(db, "posts", id), data);
             else {
-                data.isPinned = false; // 新規投稿は固定なし
+                data.isPinned = false;
                 await addDoc(collection(db, "posts"), data);
             }
             document.getElementById('post-modal').style.display = 'none';
