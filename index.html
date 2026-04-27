@@ -27,9 +27,11 @@
         
         .com-item { background: #f0f0f0; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 5px solid var(--main-color); }
         .react-bar { display: flex; gap: 15px; margin-top: 8px; font-weight: bold; }
-        .react-btn { cursor: pointer; background: white; padding: 4px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 0.9rem; transition: 0.1s; }
-        .react-btn:active { transform: scale(1.1); }
-        .react-btn.disabled { opacity: 0.5; cursor: default; background: #eee; }
+        .react-btn { cursor: pointer; background: white; padding: 4px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 0.9rem; transition: 0.2s; }
+        
+        /* 選択中のボタンを光らせる */
+        .react-btn.active-good { background: #ffccd5; border-color: var(--main-color); color: var(--main-color); box-shadow: 0 0 5px var(--main-color); }
+        .react-btn.active-bad { background: #d1d1d1; border-color: #333; color: #333; box-shadow: 0 0 5px #333; }
 
         #post-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--main-color); color: white; border: none; border-radius: 50%; font-size: 30px; cursor: pointer; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         input, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
@@ -112,13 +114,13 @@
             comments.sort((a,b) => (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0));
 
             comments.forEach(c => {
-                const hasReacted = localStorage.getItem(`react_${c.id}`);
+                const myReact = localStorage.getItem(`react_${c.id}`);
                 list.insertAdjacentHTML('beforeend', `
                     <div class="com-item">
                         <b>${c.user}</b>：${c.text}
                         <div class="react-bar">
-                            <span class="react-btn ${hasReacted ? 'disabled' : ''}" onclick="react('${c.id}','good')">👍 ${c.good || 0}</span>
-                            <span class="react-btn ${hasReacted ? 'disabled' : ''}" onclick="react('${c.id}','bad')">👎 ${c.bad || 0}</span>
+                            <span class="react-btn ${myReact === 'good' ? 'active-good' : ''}" onclick="react('${c.id}','good')">👍 ${c.good || 0}</span>
+                            <span class="react-btn ${myReact === 'bad' ? 'active-bad' : ''}" onclick="react('${c.id}','bad')">👎 ${c.bad || 0}</span>
                             <span style="color:red; font-size:0.75rem; cursor:pointer; margin-left:auto;" onclick="delCom('${c.id}','${c.pw}')">[削除]</span>
                         </div>
                     </div>`);
@@ -126,15 +128,27 @@
         });
     };
 
-    // リアクション（1回制限 & どちらか片方）
+    // リアクション切り替え・取り消し機能
     window.react = async (comId, type) => {
         const storageKey = `react_${comId}`;
-        if (localStorage.getItem(storageKey)) {
-            alert("リアクションは1回までだよ！");
-            return;
-        }
-        await updateDoc(doc(db, "comments", comId), { [type]: increment(1) });
-        localStorage.setItem(storageKey, type);
+        const prevType = localStorage.getItem(storageKey);
+        const comRef = doc(db, "comments", comId);
+
+        try {
+            if (prevType === type) {
+                // 同じのを押したら取り消し
+                await updateDoc(comRef, { [type]: increment(-1) });
+                localStorage.removeItem(storageKey);
+            } else if (prevType) {
+                // 違う方に切り替え
+                await updateDoc(comRef, { [prevType]: increment(-1), [type]: increment(1) });
+                localStorage.setItem(storageKey, type);
+            } else {
+                // 初めて押す
+                await updateDoc(comRef, { [type]: increment(1) });
+                localStorage.setItem(storageKey, type);
+            }
+        } catch (e) { console.error("Error react:", e); }
     };
 
     document.getElementById('c-btn').onclick = async () => {
@@ -173,7 +187,7 @@
 
     document.getElementById('l-btn').onclick = async () => {
         try { await signInWithEmailAndPassword(auth, document.getElementById('l-email').value, document.getElementById('l-pw').value); document.getElementById('login-modal').style.display = 'none'; }
-        catch(e) { alert("ログイン失敗"); }
+        catch(e) { alert("失敗"); }
     };
 </script>
 </body>
