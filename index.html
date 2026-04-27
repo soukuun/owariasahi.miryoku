@@ -13,65 +13,69 @@
         }
         header { background: var(--main-color); color: white; padding: 1.5rem; text-align: center; }
         .dl-section { background: #1d3557; color: white; padding: 15px; text-align: center; }
-        .dl-btn { display: inline-block; background: #ffca28; color: #1d3557 !important; padding: 10px 20px; border-radius: 30px; text-decoration: none !important; font-weight: bold; }
+        .dl-btn { display: inline-block; background: #ffca28; color: #1d3557 !important; padding: 10px 20px; border-radius: 30px; text-decoration: none !important; font-weight: bold; box-shadow: 0 4px 0 #b7950b; }
+        
         .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
-        .post { background: rgba(255, 255, 255, 0.85); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; cursor: pointer; position: relative; border: 1px solid #eee; }
-        .post.pinned { border: 2px solid var(--main-color); background: rgba(255, 240, 240, 0.95); }
+        .post { background: rgba(255, 255, 255, 0.85); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; cursor: pointer; position: relative; border: 1px solid #ddd; }
+        .post.pinned { border: 3px solid var(--main-color); background: rgba(255, 245, 245, 0.95); }
+
         .admin-controls { display: none; margin-top: 10px; border-top: 1px solid #ddd; padding-top: 10px; text-align: right; }
-        .admin-controls span { margin-left: 15px; cursor: pointer; font-size: 0.8rem; font-weight: bold; color: #457b9d; }
+        .admin-controls span { margin-left: 15px; cursor: pointer; font-size: 0.85rem; font-weight: bold; color: #457b9d; }
 
-        /* モーダル */
-        #detail-modal, #post-modal, #login-modal, #com-edit-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
         .modal-content { background: white; width: 95%; max-width: 600px; padding: 25px; border-radius: 15px; max-height: 90vh; overflow-y: auto; }
-        #post-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--main-color); color: white; border: none; border-radius: 50%; font-size: 30px; cursor: pointer; z-index: 100; }
-        input, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        
+        /* コメント表示 */
+        .c-area { margin-top: 20px; border-top: 2px solid #eee; padding-top: 15px; }
+        .com-item { background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 5px solid #e63946; }
+        .react-bar { display: flex; gap: 15px; margin-top: 8px; font-weight: bold; font-size: 0.9rem; }
+        .react-btn { cursor: pointer; transition: 0.1s; }
+        .react-btn:active { transform: scale(1.3); }
 
-        /* コメント表示エリア */
-        .com-item { background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #ccc; position: relative; }
-        .com-ops { font-size: 0.7rem; color: #888; cursor: pointer; margin-left: 10px; }
+        #post-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--main-color); color: white; border: none; border-radius: 50%; font-size: 30px; cursor: pointer; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        input, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
 <header><h1>尾張旭魅力発信ブログ</h1></header>
 <div class="dl-section">
-    <a href="https://cdn.discordapp.com/attachments/1498234296983617627/1498235945022128309/owariasahi.miryoku-win32-x64.zip?ex=69f06c75&is=69ef1af5&hm=dd78c138cc6ff8c18a3caa804a4f814edd8375debf1d58101de6cfa00b8e60e0&" class="dl-btn">📁 EXE版配布中 (.zip)</a>
+    <a href="https://cdn.discordapp.com/attachments/1498234296983617627/1498235945022128309/owariasahi.miryoku-win32-x64.zip?ex=69f06c75&is=69ef1af5&hm=dd78c138cc6ff8c18a3caa804a4f814edd8375debf1d58101de6cfa00b8e60e0&" class="dl-btn">📁 EXE版アプリ 配布中 (.zip)</a>
 </div>
 
 <main class="container" id="blog-posts"></main>
-
 <button id="post-btn">🖊️</button>
 
-<div id="detail-modal" onclick="if(event.target.id==='detail-modal')this.style.display='none'">
+<div id="detail-modal" class="modal" onclick="if(event.target.id==='detail-modal')this.style.display='none'">
     <div class="modal-content" onclick="event.stopPropagation()">
-        <span onclick="document.getElementById('detail-modal').style.display='none'" style="float:right; cursor:pointer; font-size:1.5rem;">✕</span>
         <div id="d-body"></div>
-        <hr style="margin:20px 0;">
-        <h3>💬 コメント欄</h3>
-        <div id="c-list"></div>
-        <div style="background:#eee; padding:15px; border-radius:10px; margin-top:20px;">
-            <div style="display:flex; gap:10px; margin-bottom:10px;">
-                <input type="text" id="c-user" placeholder="名前" style="margin:0;">
-                <input type="password" id="c-pw" placeholder="削除キー" style="margin:0;">
+        <div class="c-area">
+            <h3>💬 みんなの反応</h3>
+            <div id="c-list"></div>
+            <div style="background:#eee; padding:15px; border-radius:12px; margin-top:20px;">
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <input type="text" id="c-user" placeholder="名前" style="margin:0;">
+                    <input type="password" id="c-pw" placeholder="キー" style="margin:0;">
+                </div>
+                <textarea id="c-text" placeholder="コメントを書く..."></textarea>
+                <button id="c-btn" style="width:100%; padding:12px; background:var(--main-color); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">書き込む</button>
             </div>
-            <textarea id="c-text" placeholder="コメントを入力..."></textarea>
-            <button id="c-btn" style="width:100%; padding:10px; background:var(--main-color); color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">書き込む</button>
         </div>
     </div>
 </div>
 
-<div id="post-modal"><div class="modal-content"><h3>記事作成/編集</h3><input type="hidden" id="e-post-id"><input type="text" id="p-title" placeholder="タイトル"><textarea id="p-content" rows="10" placeholder="内容"></textarea><button id="p-save" style="width:100%; padding:12px; background:var(--main-color); color:white; border:none; border-radius:8px;">保存</button><button onclick="document.getElementById('post-modal').style.display='none'" style="width:100%; background:none; border:none; margin-top:10px;">閉じる</button></div></div>
+<div id="post-modal" class="modal"><div class="modal-content"><h3>記事の作成/編集</h3><input type="hidden" id="e-post-id"><input type="text" id="p-title" placeholder="タイトル"><textarea id="p-content" rows="10" placeholder="内容"></textarea><button id="p-save" style="width:100%; padding:12px; background:var(--main-color); color:white; border:none; border-radius:8px;">保存</button><button onclick="document.getElementById('post-modal').style.display='none'" style="width:100%; background:none; border:none; margin-top:10px;">キャンセル</button></div></div>
 
-<div id="login-modal"><div class="modal-content"><h3>管理者ログイン</h3><input type="email" id="l-email" placeholder="メール"><input type="password" id="l-pw" placeholder="パスワード"><button id="l-btn" style="width:100%; background:var(--text-color); color:white; padding:10px; border:none; border-radius:5px;">完了</button></div></div>
+<div id="login-modal" class="modal"><div class="modal-content"><h3>管理者ログイン</h3><input type="email" id="l-email" placeholder="メール"><input type="password" id="l-pw" placeholder="パスワード"><button id="l-btn" style="width:100%; background:var(--text-color); color:white; padding:10px; border:none; border-radius:5px;">OK</button></div></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot, serverTimestamp, where, increment } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAttvrhbeton37WOWTcBQqUhcqdep0oVFs", authDomain: "owariasahi-yuumei-burogu.firebaseapp.com", projectId: "owariasahi-yuumei-burogu", storageBucket: "owariasahi-yuumei-burogu.firebasestorage.app", messagingSenderId: "486043897492", appId: "1:486043897492:web:e0b8e3263db278bde12e81" };
     const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);
-    let currentUser = null; let currentPostId = null; let unsubscribeComments = null;
+    let currentUser = null; let currentPostId = null; let unsubscribeCom = null;
 
     onAuthStateChanged(auth, u => { currentUser = u; renderPosts(); });
 
@@ -83,50 +87,51 @@
             posts.forEach(p => {
                 container.insertAdjacentHTML('beforeend', `
                     <article class="post ${p.isPinned?'pinned':''}" onclick="showDetail('${p.id}', '${p.title}', \`${p.content}\`)">
-                        ${p.isPinned?'<small style="color:red;font-weight:bold;">📌 固定記事</small>':''}
-                        <h2>${p.title}</h2><p style="color:#666">${p.content.substring(0,40).replace(/<br>/g,' ')}...</p>
+                        ${p.isPinned?'<b style="color:red">📌 固定中</b>':''}
+                        <h2>${p.title}</h2><p style="color:#666">${p.content.substring(0,40)}...</p>
                         <div class="admin-controls" style="display:${currentUser?'block':'none'}">
-                            <span onclick="event.stopPropagation();updateDoc(doc(db,'posts','${p.id}'),{isPinned:!${p.isPinned}})">📌固定切替</span>
-                            <span onclick="event.stopPropagation();openEdit('${p.id}','${p.title}', \`${p.content.replace(/`/g,'\\`')}\`)">✏️編集</span>
-                            <span onclick="event.stopPropagation();if(confirm('削除しますか？'))deleteDoc(doc(db,'posts','${p.id}'))" style="color:red;">🗑️削除</span>
+                            <span onclick="event.stopPropagation(); flipPin('${p.id}', ${p.isPinned})">${p.isPinned?'解除':'固定'}</span>
+                            <span onclick="event.stopPropagation(); openEdit('${p.id}','${p.title}', \`${p.content.replace(/`/g,'\\`')}\`)">編集</span>
+                            <span onclick="event.stopPropagation(); if(confirm('消す？')) deleteDoc(doc(db,'posts','${p.id}'))" style="color:red">削除</span>
                         </div>
                     </article>`);
             });
         });
     }
 
+    window.flipPin = async (id, s) => { await updateDoc(doc(db, "posts", id), { isPinned: !s }); };
+
     window.showDetail = (id, title, body) => {
         currentPostId = id;
-        document.getElementById('d-body').innerHTML = `<h1 style="color:var(--main-color)">${title}</h1><div>${body}</div>`;
+        document.getElementById('d-body').innerHTML = `<h1>${title}</h1><div>${body}</div>`;
         document.getElementById('detail-modal').style.display = 'flex';
-        
-        // 前のコメント購読を解除
-        if (unsubscribeComments) unsubscribeComments();
-        
-        // コメントをリアルタイム取得
-        const qCom = query(collection(db, "comments"), where("postId", "==", id), orderBy("timestamp", "asc"));
-        unsubscribeComments = onSnapshot(qCom, s => {
+        if (unsubscribeCom) unsubscribeCom();
+        const q = query(collection(db, "comments"), where("postId", "==", id), orderBy("timestamp", "asc"));
+        unsubscribeCom = onSnapshot(q, s => {
             const list = document.getElementById('c-list'); list.innerHTML = '';
-            if(s.empty) { list.innerHTML = '<p style="color:#888; font-size:0.8rem;">まだコメントはありません。</p>'; }
             s.forEach(d => {
                 const c = d.data();
                 list.insertAdjacentHTML('beforeend', `
                     <div class="com-item">
-                        <strong>${c.user}</strong>：${c.text}
-                        <div style="text-align:right; margin-top:5px;">
-                            <span class="com-ops" onclick="delCom('${d.id}','${c.pw}')">[削除]</span>
+                        <b>${c.user}</b>：${c.text}
+                        <div class="react-bar">
+                            <span class="react-btn" onclick="react('${d.id}','good')">👍 ${c.good||0}</span>
+                            <span class="react-btn" onclick="react('${d.id}','bad')">👎 ${c.bad||0}</span>
+                            <span style="color:red; font-size:0.7rem; cursor:pointer; margin-left:auto;" onclick="delCom('${d.id}','${c.pw}')">[削除]</span>
                         </div>
                     </div>`);
             });
         });
     };
 
+    window.react = async (id, type) => { await updateDoc(doc(db, "comments", id), { [type]: increment(1) }); };
+
     document.getElementById('c-btn').onclick = async () => {
-        const u = document.getElementById('c-user').value || "名無しあさぴー";
+        const u = document.getElementById('c-user').value || "匿名";
         const p = document.getElementById('c-pw').value;
         const t = document.getElementById('c-text').value;
-        if(!t || !p) return alert("内容とキーを入力してね！");
-        await addDoc(collection(db, "comments"), { postId: currentPostId, user: u, pw: p, text: t, timestamp: serverTimestamp() });
+        if(!t || !p) return alert("内容とキー必須");
+        await addDoc(collection(db, "comments"), { postId: currentPostId, user: u, pw: p, text: t, good: 0, bad: 0, timestamp: serverTimestamp() });
         document.getElementById('c-text').value = "";
     };
 
@@ -146,8 +151,8 @@
     };
 
     window.delCom = async (id, correct) => {
-        if(currentUser || prompt("削除キーを入力") === correct) await deleteDoc(doc(db, "comments", id));
-        else alert("キーが違います");
+        if(currentUser || prompt("キー入力") === correct) await deleteDoc(doc(db, "comments", id));
+        else alert("失敗");
     };
 
     document.getElementById('post-btn').onclick = () => {
@@ -157,7 +162,7 @@
 
     document.getElementById('l-btn').onclick = async () => {
         try { await signInWithEmailAndPassword(auth, document.getElementById('l-email').value, document.getElementById('l-pw').value); document.getElementById('login-modal').style.display = 'none'; }
-        catch(e) { alert("ログイン失敗"); }
+        catch(e) { alert("失敗"); }
     };
 </script>
 </body>
