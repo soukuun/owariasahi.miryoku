@@ -3,128 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>尾張旭魅力発信ブログ｜管理者フル機能版</title>
+    <title>尾張旭魅力発信ブログ</title>
     <style>
         :root { --main-color: #e63946; --bg-color: #f1faee; --text-color: #1d3557; }
-        
         body { 
-            font-family: 'Helvetica Neue', Arial, sans-serif; 
-            background-color: var(--bg-color); 
-            margin: 0; padding-bottom: 80px; 
+            font-family: 'Helvetica Neue', Arial, sans-serif; background-color: var(--bg-color); margin: 0; padding-bottom: 80px;
             background-image: url('https://cdn.discordapp.com/attachments/1497939794414796948/1498239305129136179/asapi-2.png?ex=69f06f96&is=69ef1e16&hm=1ca9fbe39d4e9945c262b793d47bc78b0e26466413fa546e6830178f217a68cf&');
             background-repeat: no-repeat; background-position: center; background-attachment: fixed; background-size: 70%;
         }
-
         header { background: var(--main-color); color: white; padding: 1.5rem; text-align: center; }
         .dl-section { background: #1d3557; color: white; padding: 15px; text-align: center; }
         .dl-btn { display: inline-block; background: #ffca28; color: #1d3557 !important; padding: 10px 20px; border-radius: 30px; text-decoration: none !important; font-weight: bold; }
-
         .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+        .post { background: rgba(255, 255, 255, 0.85); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; cursor: pointer; position: relative; }
+        .post.pinned { border: 2px solid var(--main-color); }
+        .admin-controls { display: none; margin-top: 10px; border-top: 1px solid #ddd; padding-top: 10px; text-align: right; font-size: 0.8rem; }
+        .admin-controls span { margin-left: 15px; cursor: pointer; font-weight: bold; }
         
-        /* 記事カード */
-        .post { background: rgba(255, 255, 255, 0.85); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; cursor: pointer; position: relative; border: 2px solid transparent; }
-        .post.pinned { border: 2px solid var(--main-color); background: rgba(255, 245, 245, 0.9); }
-        .post h2 { margin: 5px 0; color: var(--main-color); }
-        
-        /* 管理者用ボタンのスタイル */
-        .admin-controls { display: none; margin-top: 10px; border-top: 1px solid #ddd; padding-top: 10px; text-align: right; }
-        .admin-controls span { margin-left: 15px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
-        .btn-edit { color: #457b9d; } .btn-del { color: #e63946; } .btn-pin { color: #f4a261; }
-
-        /* モーダル */
-        #detail-modal, #post-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: white; width: 95%; max-width: 600px; padding: 20px; border-radius: 15px; max-height: 90vh; overflow-y: auto; }
-        
+        #detail-modal, #post-modal, #login-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: white; width: 95%; max-width: 600px; padding: 25px; border-radius: 15px; max-height: 90vh; overflow-y: auto; }
         #post-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--main-color); color: white; border: none; border-radius: 50%; font-size: 30px; cursor: pointer; z-index: 100; }
-        input, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ddd; box-sizing: border-box; }
+        input, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
 <header><h1>尾張旭魅力発信ブログ</h1></header>
-
 <div class="dl-section">
     <a href="https://cdn.discordapp.com/attachments/1498234296983617627/1498235945022128309/owariasahi.miryoku-win32-x64.zip?ex=69f06c75&is=69ef1af5&hm=dd78c138cc6ff8c18a3caa804a4f814edd8375debf1d58101de6cfa00b8e60e0&" class="dl-btn">📁 EXE版配布中 (.zip)</a>
 </div>
 
-<main class="container" id="blog-posts"></main>
+<main class="container" id="blog-posts">あさぴーが準備中...</main>
 
 <button id="post-btn">🖊️</button>
 
-<div id="detail-modal" onclick="closeDetail(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <div id="detail-body"></div>
-        <hr>
-        <h3>💬 コメント欄</h3>
-        <div id="comments-display"></div>
-        <div style="background:#f0f0f0; padding:10px; border-radius:10px;">
-            <input type="text" id="com-user" placeholder="名前" style="width:48%">
-            <input type="password" id="com-pw" placeholder="削除キー" style="width:48%">
-            <textarea id="com-text" placeholder="コメント内容"></textarea>
-            <button id="submit-comment" style="width:100%; padding:10px; background:var(--text-color); color:white; border:none; border-radius:5px; cursor:pointer;">投稿</button>
-        </div>
-    </div>
-</div>
+<div id="login-modal"><div class="modal-content"><h3>管理者ログイン</h3><input type="email" id="l-email" placeholder="メール"><input type="password" id="l-pw" placeholder="パスワード"><button id="l-btn" style="width:100%; padding:10px; background:var(--text-color); color:white; border:none; border-radius:5px;">ログイン</button></div></div>
 
-<div id="post-modal">
-    <div class="modal-content">
-        <h3 id="modal-title">記事を書く</h3>
-        <input type="hidden" id="edit-id">
-        <input type="text" id="post-title" placeholder="タイトル">
-        <textarea id="post-content" rows="8" placeholder="内容（URLを貼ると画像やZIPボタンになります）"></textarea>
-        <button id="save-post-btn" style="width:100%; background:var(--main-color); color:white; padding:12px; border:none; border-radius:8px; cursor:pointer;">保存する</button>
-        <button onclick="document.getElementById('post-modal').style.display='none'" style="width:100%; background:none; border:none; margin-top:10px; color:#888;">キャンセル</button>
-    </div>
-</div>
+<div id="post-modal"><div class="modal-content"><h3 id="m-title">記事作成</h3><input type="hidden" id="e-id"><input type="text" id="p-title" placeholder="タイトル"><textarea id="p-content" rows="8" placeholder="内容"></textarea><button id="p-save" style="width:100%; padding:12px; background:var(--main-color); color:white; border:none; border-radius:8px;">保存</button><button onclick="document.getElementById('post-modal').style.display='none'" style="width:100%; background:none; border:none; margin-top:10px;">閉じる</button></div></div>
+
+<div id="detail-modal" onclick="if(event.target.id==='detail-modal')this.style.display='none'"><div class="modal-content" onclick="event.stopPropagation()"><div id="d-body"></div><hr><h3>💬 コメント</h3><div id="c-list"></div><div style="background:#f9f9f9; padding:15px; border-radius:10px;"><input type="text" id="c-user" placeholder="名前(2ch風)" style="width:48%"><input type="password" id="c-pw" placeholder="削除キー" style="width:48%"><textarea id="c-text" placeholder="コメント内容"></textarea><button id="c-btn" style="width:100%; padding:10px; background:var(--main-color); color:white; border:none; border-radius:5px;">書き込む</button></div></div></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot, serverTimestamp, where, increment } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAttvrhbeton37WOWTcBQqUhcqdep0oVFs",
-        authDomain: "owariasahi-yuumei-burogu.firebaseapp.com",
-        projectId: "owariasahi-yuumei-burogu",
-        storageBucket: "owariasahi-yuumei-burogu.firebasestorage.app",
-        messagingSenderId: "486043897492",
-        appId: "1:486043897492:web:e0b8e3263db278bde12e81"
-    };
+    const firebaseConfig = { apiKey: "AIzaSyAttvrhbeton37WOWTcBQqUhcqdep0oVFs", authDomain: "owariasahi-yuumei-burogu.firebaseapp.com", projectId: "owariasahi-yuumei-burogu", storageBucket: "owariasahi-yuumei-burogu.firebasestorage.app", messagingSenderId: "486043897492", appId: "1:486043897492:web:e0b8e3263db278bde12e81" };
+    const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);
+    let currentUser = null; let currentPostId = null;
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    let currentUser = null;
-    let currentPostId = null;
+    onAuthStateChanged(auth, u => { currentUser = u; render(); });
 
-    onAuthStateChanged(auth, (u) => { currentUser = u; renderPosts(); });
-
-    function formatBody(text) {
-        let b = text;
-        b = b.replace(/(https?:\/\/[\w\/:%#\$&\?\(\)~\.=\+\-]+(\.jpg|\.png|\.gif|\.jpeg|\.webp)[\w\/:%#\$&\?\(\)~\.=\+\-]*)/gi, '<img src="$1" style="max-width:100%; border-radius:8px; margin:10px 0; display:block;">');
-        b = b.replace(/(https?:\/\/[\w\/:%#\$&\?\(\)~\.=\+\-]+(\.zip)[\w\/:%#\$&\?\(\)~\.=\+\-]*)/gi, '<div><a href="$1" class="dl-btn" style="background:#1d3557; color:white !important; font-size:0.8rem;">📁 ZIPをダウンロード</a></div>');
-        return b;
-    }
-
-    function renderPosts() {
-        const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
-        onSnapshot(q, (snapshot) => {
-            const container = document.getElementById('blog-posts');
-            container.innerHTML = '';
-            let allPosts = [];
-            snapshot.forEach(d => allPosts.push({id: d.id, ...d.data()}));
-            allPosts.sort((a,b) => (b.isPinned||0) - (a.isPinned||0));
-
-            allPosts.forEach(p => {
+    function render() {
+        onSnapshot(query(collection(db, "posts"), orderBy("timestamp", "desc")), s => {
+            const container = document.getElementById('blog-posts'); container.innerHTML = '';
+            let posts = []; s.forEach(d => posts.push({id: d.id, ...d.data()}));
+            posts.sort((a,b) => (b.isPinned||0) - (a.isPinned||0));
+            posts.forEach(p => {
                 container.insertAdjacentHTML('beforeend', `
-                    <article class="post ${p.isPinned ? 'pinned' : ''}" onclick="showDetail('${p.id}', '${p.title}', \`${formatBody(p.content).replace(/`/g, '\\`')}\`)">
-                        ${p.isPinned ? '<span style="color:red; font-size:0.7rem; font-weight:bold;">📌 固定記事</span>' : ''}
-                        <h2>${p.title}</h2>
-                        <div style="font-size:0.9rem; color:#666;">${p.content.substring(0, 40).replace(/<br>/g, ' ')}...</div>
-                        <div class="admin-controls" style="display: ${currentUser ? 'block' : 'none'}">
-                            <span class="btn-pin" onclick="event.stopPropagation(); togglePostPin('${p.id}', ${p.isPinned})">${p.isPinned ? '📌 外す' : '📌 固定'}</span>
-                            <span class="btn-edit" onclick="event.stopPropagation(); openEdit('${p.id}', '${p.title}', \`${p.content.replace(/`/g, '\\`')}\`)">編集</span>
-                            <span class="btn-del" onclick="event.stopPropagation(); deletePost('${p.id}')">削除</span>
+                    <article class="post ${p.isPinned?'pinned':''}" onclick="showDetail('${p.id}', '${p.title}', \`${p.content}\`)">
+                        <h2>${p.title}</h2><p style="color:#666">${p.content.substring(0,40)}...</p>
+                        <div class="admin-controls" style="display:${currentUser?'block':'none'}">
+                            <span onclick="event.stopPropagation();updateDoc(doc(db,'posts','${p.id}'),{isPinned:!${p.isPinned}})">${p.isPinned?'外す':'固定'}</span>
+                            <span onclick="event.stopPropagation();deletePost('${p.id}')">削除</span>
                         </div>
                     </article>`);
             });
@@ -132,71 +73,38 @@
     }
 
     window.showDetail = (id, title, body) => {
-        currentPostId = id;
-        document.getElementById('detail-body').innerHTML = `<h1>${title}</h1><div>${body}</div>`;
+        currentPostId = id; document.getElementById('d-body').innerHTML = `<h1>${title}</h1><div>${body}</div>`;
         document.getElementById('detail-modal').style.display = 'flex';
-        loadComments(id);
-    };
-
-    function loadComments(postId) {
-        const q = query(collection(db, "comments"), where("postId", "==", postId), orderBy("timestamp", "asc"));
-        onSnapshot(q, (snapshot) => {
-            const list = document.getElementById('comments-display');
-            list.innerHTML = '';
-            snapshot.forEach(d => {
-                const c = d.data();
-                list.insertAdjacentHTML('beforeend', `<div style="border-bottom:1px solid #eee; padding:10px 0;"><strong>${c.user}</strong>：${c.text} <span style="color:red; font-size:0.7rem; cursor:pointer;" onclick="delCom('${d.id}', '${c.pw}')"> [削除]</span></div>`);
-            });
+        onSnapshot(query(collection(db, "comments"), where("postId", "==", id), orderBy("timestamp", "asc")), s => {
+            const list = document.getElementById('c-list'); list.innerHTML = '';
+            s.forEach(d => { const c = d.data(); list.insertAdjacentHTML('beforeend', `<div style="padding:10px; border-bottom:1px solid #eee"><strong>${c.user}</strong>：${c.text} <span style="color:red; cursor:pointer; font-size:0.7rem" onclick="delCom('${d.id}','${c.pw}')">[消]</span></div>`); });
         });
-    }
-
-    // --- 管理者用アクション ---
-    window.togglePostPin = async (id, s) => { await updateDoc(doc(db, "posts", id), { isPinned: !s }); };
-    window.deletePost = async (id) => { if(confirm("記事を削除する？")) await deleteDoc(doc(db, "posts", id)); };
-    window.openEdit = (id, title, content) => {
-        document.getElementById('edit-id').value = id;
-        document.getElementById('post-title').value = title;
-        document.getElementById('post-content').value = content.replace(/<br>/g, '\n');
-        document.getElementById('modal-title').innerText = "記事を編集";
-        document.getElementById('post-modal').style.display = 'flex';
     };
+
+    document.getElementById('c-btn').onclick = async () => {
+        const u = document.getElementById('c-user').value || "匿名"; const p = document.getElementById('c-pw').value; const t = document.getElementById('c-text').value;
+        if(!t || !p) return alert("内容とキーを入れてね");
+        await addDoc(collection(db, "comments"), { postId: currentPostId, user: u, pw: p, text: t, timestamp: serverTimestamp() });
+        document.getElementById('c-text').value = "";
+    };
+
+    window.delCom = async (id, correct) => { if(currentUser || prompt("キー入力") === correct) await deleteDoc(doc(db, "comments", id)); };
+    window.deletePost = async id => { if(confirm("消す？")) await deleteDoc(doc(db, "posts", id)); };
 
     document.getElementById('post-btn').onclick = () => {
-        if(!currentUser) return alert("管理者ログインが必要です");
-        document.getElementById('edit-id').value = "";
-        document.getElementById('post-title').value = "";
-        document.getElementById('post-content').value = "";
-        document.getElementById('modal-title').innerText = "記事を書く";
-        document.getElementById('post-modal').style.display = 'flex';
+        if(!currentUser) document.getElementById('login-modal').style.display = 'flex';
+        else { document.getElementById('e-id').value = ""; document.getElementById('post-modal').style.display = 'flex'; }
     };
 
-    document.getElementById('save-post-btn').onclick = async () => {
-        const id = document.getElementById('edit-id').value;
-        const data = {
-            title: document.getElementById('post-title').value,
-            content: document.getElementById('post-content').value.replace(/\n/g, '<br>'),
-            timestamp: serverTimestamp()
-        };
-        if(id) await updateDoc(doc(db, "posts", id), data);
-        else { data.isPinned = false; await addDoc(collection(db, "posts"), data); }
-        document.getElementById('post-modal').style.display = 'none';
+    document.getElementById('l-btn').onclick = async () => {
+        try { await signInWithEmailAndPassword(auth, document.getElementById('l-email').value, document.getElementById('l-pw').value); document.getElementById('login-modal').style.display = 'none'; }
+        catch(e) { alert("失敗"); }
     };
 
-    // --- コメント投稿/削除 ---
-    document.getElementById('submit-comment').onclick = async () => {
-        const user = document.getElementById('com-user').value || "匿名";
-        const pw = document.getElementById('com-pw').value;
-        const text = document.getElementById('com-text').value;
-        if(!text || !pw) return alert("入力してね");
-        await addDoc(collection(db, "comments"), { postId: currentPostId, user, pw, text, timestamp: serverTimestamp() });
-        document.getElementById('com-text').value = "";
+    document.getElementById('p-save').onclick = async () => {
+        const data = { title: document.getElementById('p-title').value, content: document.getElementById('p-content').value.replace(/\n/g, '<br>'), timestamp: serverTimestamp() };
+        await addDoc(collection(db, "posts"), data); document.getElementById('post-modal').style.display = 'none';
     };
-    window.delCom = async (id, correct) => {
-        if(currentUser || prompt("削除キー") === correct) await deleteDoc(doc(db, "comments", id));
-        else alert("失敗");
-    };
-
-    window.closeDetail = (e) => { if(e.target.id === 'detail-modal') document.getElementById('detail-modal').style.display = 'none'; };
 </script>
 </body>
 </html>
