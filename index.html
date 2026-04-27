@@ -16,14 +16,15 @@
         .post h2 { margin: 10px 0; color: var(--main-color); }
         .badge { background: #a8dadc; color: var(--text-color); padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; }
         
-        /* 📁 ZIPダウンロードボタンのスタイル */
+        /* 📁 ZIPダウンロードボタンのデザイン */
         .zip-download-link {
             display: inline-flex; align-items: center; background: #1d3557; color: white !important;
-            padding: 10px 20px; border-radius: 8px; text-decoration: none !important;
-            font-weight: bold; margin-top: 10px; border: 2px solid #1d3557; transition: 0.2s;
+            padding: 12px 24px; border-radius: 8px; text-decoration: none !important;
+            font-weight: bold; margin: 15px 0; border: 2px solid #1d3557; transition: 0.2s;
+            box-shadow: 0 4px 0 #0d1a2b;
         }
-        .zip-download-link:hover { background: white; color: #1d3557 !important; }
-        .zip-info { font-size: 0.85rem; color: #666; margin-top: 5px; font-style: italic; }
+        .zip-download-link:hover { transform: translateY(2px); box-shadow: 0 2px 0 #0d1a2b; background: #2a4a75; }
+        .zip-info { font-size: 0.8rem; color: #666; margin-bottom: 10px; }
 
         .admin-tools { display: none; margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px; text-align: right; }
         .edit-btn, .delete-btn, .pin-btn { cursor: pointer; font-weight: bold; margin-left: 15px; font-size: 0.9rem; }
@@ -55,7 +56,7 @@
         <input type="hidden" id="edit-id">
         <input type="text" id="post-title" placeholder="タイトル">
         <select id="post-tag"><option value="乗り物">乗り物</option><option value="食べ物">食べ物</option><option value="お出かけ">お出かけ</option><option value="配布">配布</option><option value="その他">その他</option></select>
-        <textarea id="post-content" placeholder="内容を書こう！&#10;・Discordの画像URLで画像表示&#10;・DiscordのZIPリンクでDLボタン化" rows="8"></textarea>
+        <textarea id="post-content" placeholder="Discordの画像URLやZIPリンクを貼ると自動でボタンや画像になるよ！" rows="8"></textarea>
         <button id="submit-post">保存する</button>
         <button onclick="document.getElementById('post-modal').style.display='none'" style="margin-top:10px; background:none; border:none; color:#888; cursor:pointer; width:100%;">キャンセル</button>
     </div>
@@ -96,11 +97,11 @@
                 const isPinned = p.isPinned || false;
                 let body = p.content;
 
-                // 🖼️ 画像URLを画像に変換
-                body = body.replace(/(https?:\/\/[\w\/:%#\$&\?\(\)~\.=\+\-]+(\.jpg|\.png|\.gif|\.jpeg|\.webp))/gi, '<img src="$1" style="max-width:100%; border-radius:8px; margin-top:10px; display:block;" alt="画像">');
+                // 🖼️ 画像変換（末尾にゴミがついててもOK版）
+                body = body.replace(/(https?:\/\/[\w\/:%#\$&\?\(\)~\.=\+\-]+(\.jpg|\.png|\.gif|\.jpeg|\.webp)[\w\/:%#\$&\?\(\)~\.=\+\-]*)/gi, '<img src="$1" style="max-width:100%; border-radius:8px; margin-top:10px; display:block;" alt="画像">');
 
-                // 📁 ZIPリンクをボタンに変換
-                body = body.replace(/(https?:\/\/[\w\/:%#\$&\?\(\)~\.=\+\-]+\.zip)/gi, '<div><a href="$1" class="zip-download-link">📁 ファイルをダウンロード(.zip)</a><div class="zip-info">※クリックするとダウンロードが始まります</div></div>');
+                // 📁 ZIPボタン変換（URLの途中に .zip があればOK版）
+                body = body.replace(/(https?:\/\/[\w\/:%#\$&\?\(\)~\.=\+\-]+(\.zip)[\w\/:%#\$&\?\(\)~\.=\+\-]*)/gi, '<div><a href="$1" class="zip-download-link">📁 EXE版ファイルをダウンロード (.zip)</a><div class="zip-info">※クリックするとダウンロードが始まります。ウイルス警告が出る場合がありますが、安全です。</div></div>');
 
                 container.insertAdjacentHTML('beforeend', `
                     <article class="post ${isPinned ? 'pinned' : ''}">
