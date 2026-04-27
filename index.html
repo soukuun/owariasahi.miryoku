@@ -13,18 +13,25 @@
         }
         header { background: var(--main-color); color: white; padding: 1.5rem; text-align: center; }
         .dl-section { background: #1d3557; color: white; padding: 15px; text-align: center; }
-        .dl-btn { display: inline-block; background: #ffca28; color: #1d3557 !important; padding: 10px 20px; border-radius: 30px; text-decoration: none !important; font-weight: bold; }
+        .dl-btn { display: inline-block; background: #ffca28; color: #1d3557 !important; padding: 10px 20px; border-radius: 30px; text-decoration: none !important; font-weight: bold; box-shadow: 0 4px 0 #b7950b; }
+        
         .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
         .post { background: rgba(255, 255, 255, 0.95); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; cursor: pointer; border: 1px solid #ddd; }
-        .post.pinned { border: 3px solid var(--main-color); }
+        .post.pinned { border: 3px solid var(--main-color); background: rgba(255, 245, 245, 0.95); }
+
         .admin-controls { display: none; margin-top: 10px; border-top: 1px solid #ddd; padding-top: 10px; text-align: right; }
         .admin-controls span { margin-left: 15px; cursor: pointer; font-size: 0.85rem; font-weight: bold; color: #457b9d; }
+
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
         .modal-content { background: white; width: 95%; max-width: 600px; padding: 25px; border-radius: 15px; max-height: 90vh; overflow-y: auto; }
+        
         .com-item { background: #f0f0f0; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 5px solid var(--main-color); }
         .react-bar { display: flex; gap: 15px; margin-top: 8px; font-weight: bold; }
-        .react-btn { cursor: pointer; background: white; padding: 2px 8px; border-radius: 5px; border: 1px solid #ccc; }
-        #post-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--main-color); color: white; border: none; border-radius: 50%; font-size: 30px; cursor: pointer; z-index: 100; }
+        .react-btn { cursor: pointer; background: white; padding: 4px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 0.9rem; transition: 0.1s; }
+        .react-btn:active { transform: scale(1.1); }
+        .react-btn.disabled { opacity: 0.5; cursor: default; background: #eee; }
+
+        #post-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--main-color); color: white; border: none; border-radius: 50%; font-size: 30px; cursor: pointer; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         input, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
     </style>
 </head>
@@ -50,7 +57,7 @@
                 <input type="password" id="c-pw" placeholder="キー" style="margin:0;">
             </div>
             <textarea id="c-text" placeholder="コメントを書く..."></textarea>
-            <button id="c-btn" style="width:100%; padding:12px; background:var(--main-color); color:white; border:none; border-radius:8px; font-weight:bold;">書き込む</button>
+            <button id="c-btn" style="width:100%; padding:12px; background:var(--main-color); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">書き込む</button>
         </div>
     </div>
 </div>
@@ -97,23 +104,21 @@
         document.getElementById('detail-modal').style.display = 'flex';
         
         if (unsubCom) unsubCom();
-        // ★修正点：orderByを外して、プログラム側でソートする（Firebaseのエラー回避）
         const q = query(collection(db, "comments"), where("postId", "==", id));
         unsubCom = onSnapshot(q, s => {
             const list = document.getElementById('c-list'); list.innerHTML = '';
             let comments = [];
             s.forEach(d => comments.push({id: d.id, ...d.data()}));
-            
-            // 時間順に並び替え
             comments.sort((a,b) => (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0));
 
             comments.forEach(c => {
+                const hasReacted = localStorage.getItem(`react_${c.id}`);
                 list.insertAdjacentHTML('beforeend', `
                     <div class="com-item">
                         <b>${c.user}</b>：${c.text}
                         <div class="react-bar">
-                            <span class="react-btn" onclick="react('${c.id}','good')">👍 ${c.good || 0}</span>
-                            <span class="react-btn" onclick="react('${c.id}','bad')">👎 ${c.bad || 0}</span>
+                            <span class="react-btn ${hasReacted ? 'disabled' : ''}" onclick="react('${c.id}','good')">👍 ${c.good || 0}</span>
+                            <span class="react-btn ${hasReacted ? 'disabled' : ''}" onclick="react('${c.id}','bad')">👎 ${c.bad || 0}</span>
                             <span style="color:red; font-size:0.75rem; cursor:pointer; margin-left:auto;" onclick="delCom('${c.id}','${c.pw}')">[削除]</span>
                         </div>
                     </div>`);
@@ -121,7 +126,16 @@
         });
     };
 
-    window.react = async (id, type) => { await updateDoc(doc(db, "comments", id), { [type]: increment(1) }); };
+    // リアクション（1回制限 & どちらか片方）
+    window.react = async (comId, type) => {
+        const storageKey = `react_${comId}`;
+        if (localStorage.getItem(storageKey)) {
+            alert("リアクションは1回までだよ！");
+            return;
+        }
+        await updateDoc(doc(db, "comments", comId), { [type]: increment(1) });
+        localStorage.setItem(storageKey, type);
+    };
 
     document.getElementById('c-btn').onclick = async () => {
         const u = document.getElementById('c-user').value || "匿名";
