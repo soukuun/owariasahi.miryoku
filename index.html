@@ -7,16 +7,32 @@
     <meta name="description" content="尾張旭市の魅力を発信中。自作ファイルやZIPデータの配布も行っています。">
     <style>
         :root { --main-color: #e63946; --bg-color: #f1faee; --text-color: #1d3557; }
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; padding-bottom: 80px; }
+        body { 
+            font-family: 'Helvetica Neue', Arial, sans-serif; 
+            background: var(--bg-color); 
+            color: var(--text-color); 
+            margin: 0; 
+            padding-bottom: 80px; 
+            /* ⬇️ ここにあさぴーの画像URLを貼る！ ⬇️ */
+            background-image: url('https://cdn.discordapp.com/attachments/1218151559494303866/1233694002624892998/asapy_watermark.png?ex=662f5f1a&is=662e0d9a&hm=...あなたのURL...');
+            background-repeat: no-repeat;
+            background-position: bottom right;
+            background-attachment: fixed;
+            background-size: 200px; /* あさぴーの大きさ */
+            opacity: 0.9;
+        }
         header { background: var(--main-color); color: white; padding: 2rem; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
-        .post { background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative; border: 2px solid transparent; }
-        .post.pinned { border: 2px solid var(--main-color); background: #fff5f5; }
+        .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; position: relative; z-index: 1; }
+        .post { 
+            background: rgba(255, 255, 255, 0.95); /* 少し透けさせて背景を見せる */
+            padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative; border: 2px solid transparent; 
+        }
+        .post.pinned { border: 2px solid var(--main-color); background: rgba(255, 245, 245, 0.95); }
         .pin-badge { color: var(--main-color); font-weight: bold; font-size: 0.8rem; margin-bottom: 5px; display: block; }
         .post h2 { margin: 10px 0; color: var(--main-color); }
         .badge { background: #a8dadc; color: var(--text-color); padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; }
         
-        /* 📁 ZIPダウンロードボタンのデザイン */
         .zip-download-link {
             display: inline-flex; align-items: center; background: #1d3557; color: white !important;
             padding: 12px 24px; border-radius: 8px; text-decoration: none !important;
@@ -56,7 +72,7 @@
         <input type="hidden" id="edit-id">
         <input type="text" id="post-title" placeholder="タイトル">
         <select id="post-tag"><option value="乗り物">乗り物</option><option value="食べ物">食べ物</option><option value="お出かけ">お出かけ</option><option value="配布">配布</option><option value="その他">その他</option></select>
-        <textarea id="post-content" placeholder="Discordの画像URLやZIPリンクを貼ると自動でボタンや画像になるよ！" rows="8"></textarea>
+        <textarea id="post-content" placeholder="内容" rows="8"></textarea>
         <button id="submit-post">保存する</button>
         <button onclick="document.getElementById('post-modal').style.display='none'" style="margin-top:10px; background:none; border:none; color:#888; cursor:pointer; width:100%;">キャンセル</button>
     </div>
@@ -96,11 +112,7 @@
                 const id = p.id;
                 const isPinned = p.isPinned || false;
                 let body = p.content;
-
-                // 🖼️ 画像変換（末尾にゴミがついててもOK版）
                 body = body.replace(/(https?:\/\/[\w\/:%#\$&\?\(\)~\.=\+\-]+(\.jpg|\.png|\.gif|\.jpeg|\.webp)[\w\/:%#\$&\?\(\)~\.=\+\-]*)/gi, '<img src="$1" style="max-width:100%; border-radius:8px; margin-top:10px; display:block;" alt="画像">');
-
-                // 📁 ZIPボタン変換（URLの途中に .zip があればOK版）
                 body = body.replace(/(https?:\/\/[\w\/:%#\$&\?\(\)~\.=\+\-]+(\.zip)[\w\/:%#\$&\?\(\)~\.=\+\-]*)/gi, '<div><a href="$1" class="zip-download-link">📁 EXE版ファイルをダウンロード (.zip)</a><div class="zip-info">※クリックするとダウンロードが始まります。ウイルス警告が出る場合がありますが、安全です。</div></div>');
 
                 container.insertAdjacentHTML('beforeend', `
