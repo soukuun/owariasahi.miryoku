@@ -3,15 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>尾張旭魅力発信ブログ｜尾張旭市を有名にしたい一般人の活動記録</title>
-    <meta name="description" content="愛知県尾張旭市の魅力を発信する個人ブログです。乗り物、食べ物、お出かけスポットなど、尾張旭市を有名にするために日々更新中！">
-    <meta name="keywords" content="尾張旭市, 尾張旭, 魅力, ブログ, 愛知県, 観光, グルメ">
-    
-    <meta property="og:title" content="尾張旭魅力発信ブログ">
-    <meta property="og:description" content="尾張旭市を有名にしたい一般人による魅力発信サイト。">
-    <meta property="og:type" content="website">
-    
+    <title>尾張旭魅力発信ブログ｜配布・情報発信</title>
+    <meta name="description" content="尾張旭市の魅力を発信中。自作ファイルやZIPデータの配布も行っています。">
     <style>
         :root { --main-color: #e63946; --bg-color: #f1faee; --text-color: #1d3557; }
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; padding-bottom: 80px; }
@@ -22,11 +15,19 @@
         .pin-badge { color: var(--main-color); font-weight: bold; font-size: 0.8rem; margin-bottom: 5px; display: block; }
         .post h2 { margin: 10px 0; color: var(--main-color); }
         .badge { background: #a8dadc; color: var(--text-color); padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; }
+        
+        /* 📁 ZIPダウンロードボタンのスタイル */
+        .zip-download-link {
+            display: inline-flex; align-items: center; background: #1d3557; color: white !important;
+            padding: 10px 20px; border-radius: 8px; text-decoration: none !important;
+            font-weight: bold; margin-top: 10px; border: 2px solid #1d3557; transition: 0.2s;
+        }
+        .zip-download-link:hover { background: white; color: #1d3557 !important; }
+        .zip-info { font-size: 0.85rem; color: #666; margin-top: 5px; font-style: italic; }
+
         .admin-tools { display: none; margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px; text-align: right; }
         .edit-btn, .delete-btn, .pin-btn { cursor: pointer; font-weight: bold; margin-left: 15px; font-size: 0.9rem; }
-        .edit-btn { color: #457b9d; }
-        .delete-btn { color: #e63946; }
-        .pin-btn { color: #f4a261; }
+        .edit-btn { color: #457b9d; } .delete-btn { color: #e63946; } .pin-btn { color: #f4a261; }
         #post-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--main-color); color: white; border: none; border-radius: 50%; font-size: 35px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 100; display: flex; align-items: center; justify-content: center; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 2rem; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
@@ -39,11 +40,12 @@
 <header>
     <h1>尾張旭魅力発信ブログ</h1>
     <p>〜 尾張旭を有名にしたい一般人 〜</p>
+    <a href="https://www.instagram.com/owariasahi.yumei.sitai" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 15px; background: white; color: #e63946; text-decoration: none; border-radius: 20px; font-weight: bold; font-size: 0.8rem;">Instagram</a>
 </header>
 
 <main class="container" id="blog-posts">読み込み中...</main>
 
-<button id="post-btn" aria-label="投稿する">🖊️</button>
+<button id="post-btn">🖊️</button>
 
 <div id="login-modal" class="modal"><div class="modal-content"><h3>管理者ログイン</h3><input type="email" id="login-id" placeholder="メールアドレス"><input type="password" id="login-pw" placeholder="パスワード"><button id="login-exec" style="background:#1d3557; color:white; border:none; padding:12px; width:100%; border-radius:6px;">ログイン</button></div></div>
 
@@ -51,9 +53,9 @@
     <div class="modal-content">
         <h3 id="modal-title">記事を書く</h3>
         <input type="hidden" id="edit-id">
-        <input type="text" id="post-title" placeholder="タイトル（検索されたい言葉を入れよう！）">
-        <select id="post-tag"><option value="乗り物">乗り物</option><option value="食べ物">食べ物</option><option value="お出かけ">お出かけ</option><option value="その他">その他</option></select>
-        <textarea id="post-content" placeholder="内容（「尾張旭」という言葉を混ぜるとヒットしやすくなるよ）" rows="8"></textarea>
+        <input type="text" id="post-title" placeholder="タイトル">
+        <select id="post-tag"><option value="乗り物">乗り物</option><option value="食べ物">食べ物</option><option value="お出かけ">お出かけ</option><option value="配布">配布</option><option value="その他">その他</option></select>
+        <textarea id="post-content" placeholder="内容を書こう！&#10;・Discordの画像URLで画像表示&#10;・DiscordのZIPリンクでDLボタン化" rows="8"></textarea>
         <button id="submit-post">保存する</button>
         <button onclick="document.getElementById('post-modal').style.display='none'" style="margin-top:10px; background:none; border:none; color:#888; cursor:pointer; width:100%;">キャンセル</button>
     </div>
@@ -86,22 +88,26 @@
             const container = document.getElementById('blog-posts');
             container.innerHTML = '';
             let allPosts = [];
-            snapshot.forEach((fbDoc) => {
-                allPosts.push({ id: fbDoc.id, ...fbDoc.data() });
-            });
+            snapshot.forEach((fbDoc) => { allPosts.push({ id: fbDoc.id, ...fbDoc.data() }); });
             allPosts.sort((a, b) => (b.isPinned || false) - (a.isPinned || false));
 
             allPosts.forEach((p) => {
                 const id = p.id;
                 const isPinned = p.isPinned || false;
-                let contentWithImages = p.content.replace(/(https?:\/\/[\w\/:%#\$&\?\(\)~\.=\+\-]+(\.jpg|\.png|\.gif|\.jpeg|\.webp))/gi, '<img src="$1" style="max-width:100%; border-radius:8px; margin-top:10px; display:block;" alt="投稿画像">');
+                let body = p.content;
+
+                // 🖼️ 画像URLを画像に変換
+                body = body.replace(/(https?:\/\/[\w\/:%#\$&\?\(\)~\.=\+\-]+(\.jpg|\.png|\.gif|\.jpeg|\.webp))/gi, '<img src="$1" style="max-width:100%; border-radius:8px; margin-top:10px; display:block;" alt="画像">');
+
+                // 📁 ZIPリンクをボタンに変換
+                body = body.replace(/(https?:\/\/[\w\/:%#\$&\?\(\)~\.=\+\-]+\.zip)/gi, '<div><a href="$1" class="zip-download-link">📁 ファイルをダウンロード(.zip)</a><div class="zip-info">※クリックするとダウンロードが始まります</div></div>');
 
                 container.insertAdjacentHTML('beforeend', `
                     <article class="post ${isPinned ? 'pinned' : ''}">
                         ${isPinned ? '<span class="pin-badge">📌 固定された投稿</span>' : ''}
                         <span class="badge">${p.category}</span> <small>${p.date || ''}</small>
                         <h2>${p.title}</h2>
-                        <div>${contentWithImages}</div>
+                        <div>${body}</div>
                         <div class="admin-tools" style="display: ${currentUser ? 'block' : 'none'}">
                             <span class="pin-btn" onclick="togglePin('${id}', ${isPinned})">${isPinned ? '📌 外す' : '📌 固定'}</span>
                             <span class="edit-btn" onclick="openEdit('${id}', '${p.title}', '${p.category}', \`${p.content.replace(/<br>/g, '\n')}\`)">編集</span>
@@ -112,10 +118,7 @@
         });
     }
 
-    window.togglePin = async (id, currentStatus) => {
-        await updateDoc(doc(db, "posts", id), { isPinned: !currentStatus });
-    };
-
+    window.togglePin = async (id, currentStatus) => { await updateDoc(doc(db, "posts", id), { isPinned: !currentStatus }); };
     window.openEdit = (id, title, tag, content) => {
         document.getElementById('edit-id').value = id;
         document.getElementById('post-title').value = title;
@@ -124,16 +127,12 @@
         document.getElementById('modal-title').innerText = "記事を編集";
         document.getElementById('post-modal').style.display = 'flex';
     };
-
-    window.deletePost = async (id) => {
-        if (confirm("この記事を削除しますか？")) await deleteDoc(doc(db, "posts", id));
-    };
+    window.deletePost = async (id) => { if (confirm("この記事を削除しますか？")) await deleteDoc(doc(db, "posts", id)); };
 
     document.getElementById('submit-post').onclick = async () => {
         const btn = document.getElementById('submit-post');
         btn.innerText = "保存中..."; btn.disabled = true;
         const id = document.getElementById('edit-id').value;
-
         const data = {
             title: document.getElementById('post-title').value,
             category: document.getElementById('post-tag').value,
@@ -141,13 +140,9 @@
             date: new Date().toLocaleDateString(),
             timestamp: serverTimestamp()
         };
-
         try {
             if (id) await updateDoc(doc(db, "posts", id), data);
-            else {
-                data.isPinned = false;
-                await addDoc(collection(db, "posts"), data);
-            }
+            else { data.isPinned = false; await addDoc(collection(db, "posts"), data); }
             document.getElementById('post-modal').style.display = 'none';
         } catch (e) { alert("エラー: " + e.message); }
         finally { btn.innerText = "保存する"; btn.disabled = false; }
